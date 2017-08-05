@@ -1,7 +1,13 @@
-
-autocmd InsertEnter * : silent exec "!printf '\033]50;CursorShape=2\x7'" | exec ":redraw!"
-autocmd InsertLeave * : silent exec "!printf '\033]50;CursorShape=0\x7'" | exec ":redraw!"
-
+if has("autocmd")
+    au VimEnter,InsertLeave * silent execute '!echo -ne "\e[2 q"' | redraw!
+	  au InsertEnter,InsertChange *
+	      \ if v:insertmode == 'i' | 
+	      \   silent execute '!echo -ne "\e[6 q"' | redraw! |
+	      \ elseif v:insertmode == 'r' |
+	      \   silent execute '!echo -ne "\e[4 q"' | redraw! |
+	      \ endif
+	    au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
+	  endif
 filetype plugin on
 set omnifunc=syntaxcomplete#Complete
 
@@ -10,54 +16,22 @@ set nocompatible              " required
 filetype off                  " required
 
 " Plugins
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
-"call plug#begin('~/.vim/plugged')
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'Valloric/YouCompleteMe'
+
+call vundle#end()
+
 call plug#begin('~/.vim/plugged')
 " Make sure you use single quotes
-"
-" " Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
-Plug 'junegunn/vim-easy-align'
-"
-" " Any valid git URL is allowed
-"Plug 'https://github.com/junegunn/vim-github-dashboard.git'
-""
-"" " Group dependencies, vim-snippets depends on ultisnips
-" Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-""
-"" " On-demand loading
-" Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-" Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
-""
-"" " Using a non-master branch
-" Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
-""
-"" " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
-" Plug 'fatih/vim-go', { 'tag': '*' }
-""
-"" " Plugin options
-" Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
-""
-"" " Plugin outside ~/.vim/plugged with post-update hook
-" Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-""
-"" " Unmanaged plugin (manually installed and updated)
-" Plug '~/my-prototype-plugin'
-""
-"" " Add plugins to &runtimepath
-"
-"Plug 'davidhalter/jedi-vim'  " Python autocomplete
-"
-"Plug 'klen/python-mode'     " Python autocomplete
-"
-"Plug 'Valloric/YouCompleteMe' "C autocomplete YCM
-"
-""Plug 'lervag/vimtex'   "vim latex
-"
-"Plug 'tpope/vim-surround' " Vim surround
-"
-""vim solarized
-"Plug 'altercation/vim-colors-solarized'
-"
+" " On-demand loading
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'tpope/vim-surround' " Vim surround
+"Plug 'altercation/vim-colors-solarized'  "vim solarized
+
 call plug#end()
 
 
@@ -66,6 +40,7 @@ call plug#end()
 				
 				nnoremap ; :
 				nnoremap : ;
+				cnoremap sudow w !sudo tee % >/dev/null
 
 		" Control Keys
 			"	map      <C-w>o ;tab sp<CR>
@@ -89,10 +64,10 @@ syntax on
 set background=light
 
 "Text width
-set tw=80
-set cc=+1
-set wrap
-
+"set tw=80
+"set cc=+1
+"set wrap
+"highlight ColorColumn ctermbg=7
 
 set ruler                     " show the line number on the bar
 set more                      " use more prompt
@@ -107,7 +82,7 @@ set showcmd
 set nocompatible              " vim, not vi
 set autoindent smartindent    " auto/smart indent
 set smarttab                  " tab and backspace are smart
-set tabstop=2                 " 6 spaces
+set tabstop=4                 " 6 spaces
 set shiftwidth=2
 set scrolloff=5               " keep at least 5 lines above/below
 set sidescrolloff=5           " keep at least 5 lines left/right
@@ -120,7 +95,7 @@ set updatecount=100           " switch every 100 chars
 set complete=.,w,b,u,U,t,i,d  " do lots of scanning on tab completion
 set ttyfast                   " we have a fast terminal
 set noerrorbells              " No error bells please
-set shell=bash
+"set shell=bash
 set fileformats=unix
 set ff=unix
 set nohlsearch
@@ -140,14 +115,6 @@ set noswapfile
 set foldmethod=syntax
 "set spell spelllang=en_us
 
-set number
-set relativenumber
-set cindent
-set expandtab
-set ts=4
-set softtabstop=4
-set shiftwidth=4
-
 "  searching
  set incsearch                 " incremental search
  set ignorecase                " search ignoring case
@@ -165,4 +132,7 @@ set shiftwidth=4
 nmap <LocalLeader>tl :set list!<cr>
 " toggle paste mode
 nmap <LocalLeader>pp :set paste!<cr>
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+"cursor toggle for vim iTerm tmux
+
 
